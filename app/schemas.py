@@ -30,12 +30,21 @@ class TokenData(BaseModel):
 class UrlCreate(BaseModel):
     original: HttpUrl
 
-class UrlOut(BaseModel):
+class UrlInfo(BaseModel):
     id: int
     original: HttpUrl
-    short: str
+    short_code: str
     clicks: int
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+class UrlOut(UrlInfo):
+    short_url: HttpUrl
+
+    class Config:
+        from_attributes = True
+
+class UrlUpdate(BaseModel):
+    short_code: str
