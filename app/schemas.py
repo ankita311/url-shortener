@@ -10,6 +10,17 @@ class User(BaseModel):
 class UserCreate(User):
     password: str
 
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+
+class UserUpdateOut(User):
+    pass
+
+class UserPasswords(BaseModel):
+    old_password: str
+    new_password: str
+
 class UserOut(User):
     id: int
     urls_created: int
