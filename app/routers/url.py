@@ -50,12 +50,17 @@ def get_one_url(id: int, db: Session = Depends(database.get_db), current_user: m
     return url
 
 @router.get("/{short_code}", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
-def redirect_to_original(short_code: str, db: Session = Depends(database.get_db)):
+def redirect_to_original(short_code: str, db: Session = Depends(database.get_db), request: Request = None):
     url_entry = db.query(models.Url).filter(models.Url.short_code == short_code).first()
 
     if not url_entry:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Short Url not found")
- 
+    
+    ip = request.client.host
+
+    click = models.Click(url_id = url_entry.id, ip_address = ip)
+    db.add(click)
+
     url_entry.clicks += 1
 
     db.commit()
@@ -112,3 +117,22 @@ def delete_url(id: int, db: Session = Depends(database.get_db), current_user: mo
     db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.get("/analytics/{url_id}", response_model=schemas.Analytics)
+def get_analytics(url_id: int, 
+                  db: Session = Depends(database.get_db), 
+                  current_user: models.User = Depends(oauth2.get_current_user)):
+    
+    url = db.query(models.Url).filter(models.Url.id == url_id, models.Url.owner_id == current_user.id).first()
+
+    if not url:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Url not found")
+    
+    clicks = db.query(models.Click).filter(models.Click.url_id == url_id).all()
+
+    return {
+        'url_id': url_id,
+        'original': url.original,
+        'total_clicks': url.clicks,
+        'click_details': clicks
+    }

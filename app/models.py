@@ -4,18 +4,28 @@ from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
 from sqlalchemy.orm import relationship
 
+class Click(Base):
+    __tablename__ = 'clicks'
+
+    url_id = Column(Integer, ForeignKey('urls.id'), nullable=False)
+    ip_address = Column(String, nullable = False, primary_key=True)
+    timestamp = Column(TIMESTAMP(timezone=True), server_default=text('now()'), nullable=False, primary_key=True)
+
+    url = relationship("Url", back_populates="click_record")
+
 class Url(Base):
     __tablename__ = "urls"
 
     id = Column(Integer, primary_key = True, nullable=False)
     original = Column(String, nullable = False)
-    short_code = Column(String, nullable = False)
+    short_code = Column(String, nullable = False, unique=True)
     created_at = Column(TIMESTAMP(timezone=True), nullable= False, server_default = text('now()'))
     clicks = Column(Integer, nullable = False, server_default = text('0'))
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"),
                                           nullable=False)
 
     owner = relationship("User")
+    click_record = relationship("Click", back_populates="url", cascade="all, delete")
 
 class User(Base):
     __tablename__ = "users"
@@ -34,3 +44,5 @@ class TokenBlacklist(Base):
     id = Column(Integer, primary_key = True, nullable = False)
     jti = Column(String, unique = True, nullable = False)
     expires_at = Column(TIMESTAMP(timezone=True), nullable = False)
+
+

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, EmailStr, HttpUrl
 
 
@@ -59,3 +59,18 @@ class UrlOut(UrlInfo):
 
 class UrlUpdate(BaseModel):
     short_code: str
+
+class ClickOut(BaseModel):
+    ip_address: str
+    timestamp: datetime
+    class Config:
+        orm_mode = True
+
+class Analytics(BaseModel):
+    url_id: int
+    original: HttpUrl
+    total_clicks: int
+    click_details: List[ClickOut]
+
+    class Config:
+        orm_mode = True
