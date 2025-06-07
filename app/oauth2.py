@@ -50,6 +50,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has been revoked")
 
     user = db.query(models.User).filter(models.User.id == token.id).first()
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has been revoked")
     return user
 
 def extract_jti_exp(token: str = Depends(oauth2_scheme)):

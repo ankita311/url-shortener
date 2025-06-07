@@ -1,14 +1,16 @@
 import typer
 from rich import print
-from cli import user
+from . import user, auth
 
 app = typer.Typer()
 
-app.add_typer(user.app)
+app.add_typer(auth.app)
+app.add_typer(user.app, name="user", help="User-specific commands")
 
-@app.command()
-def hello(name: str, prompt = True):
-    print(f"hello {name}")
+
+@app.command(help="Welcome greeting")
+def hi(name: str = typer.Option(..., prompt = True, help="Name of the user")):
+    print(f"Hi {name}, welcome to shorty. your very own url shortner!")
 
 if __name__ == '__main__':
     app()

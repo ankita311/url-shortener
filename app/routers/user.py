@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 from .. import schemas, utils, models, oauth2
@@ -18,6 +19,7 @@ def create_user(user: schemas.UserCreate, db : Session = Depends(get_db)):
 
 @router.get("/profile", response_model=schemas.UserOut)
 def get_me(current_user: int = Depends(oauth2.get_current_user)):
+
     return current_user
 
 @router.patch("/update", response_model=schemas.UserUpdateOut)
@@ -28,9 +30,6 @@ def update_user(updated_user: schemas.UserUpdate,
     user_query = db.query(models.User).filter(models.User.id == current_user.id)
 
     data = updated_user.model_dump(exclude_unset=True)
-
-    # if "password" in data:
-    #     data['password'] = utils.hash(data['password'])
 
     user_query.update(data, synchronize_session=False)
     db.commit()
@@ -58,8 +57,24 @@ def update_password(user_passwords: schemas.UserPasswords,
 def delete_user(current_user: models.User = Depends(oauth2.get_current_user),
                 db: Session = Depends(get_db)):
     
+    #delete all clicks
+    user_urls = db.query(models.Url).filter(models.Url.owner_id == current_user.id).all()
+    for url in user_urls:
+        db.query(models.Click).filter(models.Click.url_id == url.id).delete()
+    
+    # Then delete all URLs for this user
+    db.query(models.Url).filter(models.Url.owner_id == current_user.id).delete()
+    
     user_query = db.query(models.User).filter(models.User.id == current_user.id)
     user_query.delete(synchronize_session=False)
     db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.get('/dashboard', response_model= List[schemas.UrlInfo])
+def dashboard(current_user: models.User = Depends(oauth2.get_current_user),
+              db: Session = Depends(get_db)):
+    
+    urls = db.query(models.Url).filter(models.Url.owner_id == current_user.id).all()
+
+    return urls

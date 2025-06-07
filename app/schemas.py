@@ -64,7 +64,7 @@ class ClickOut(BaseModel):
     ip_address: str
     timestamp: datetime
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Analytics(BaseModel):
     url_id: int
@@ -73,4 +73,4 @@ class Analytics(BaseModel):
     click_details: List[ClickOut]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
