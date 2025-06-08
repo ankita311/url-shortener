@@ -38,11 +38,11 @@ class User(Base):
                         server_default= text('now()'))
     password = Column(String, nullable = False)
     
-class TokenBlacklist(Base):
-    __tablename__ = 'token_blacklist'
+# class TokenBlacklist(Base):
+#     __tablename__ = 'token_blacklist'
 
-    id = Column(Integer, primary_key = True, nullable = False)
-    jti = Column(String, unique = True, nullable = False)
-    expires_at = Column(TIMESTAMP(timezone=True), nullable = False)
+#     id = Column(Integer, primary_key = True, nullable = False)
+#     jti = Column(String, unique = True, nullable = False)
+#     expires_at = Column(TIMESTAMP(timezone=True), nullable = False)
 
 

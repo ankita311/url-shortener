@@ -4,7 +4,6 @@ from rich import print
 from rich.table import Table
 from rich.console import Console
 from rich.panel import Panel
-from rich.spinner import Spinner
 from rich.prompt import Prompt
 import httpx
 from . import utils

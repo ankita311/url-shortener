@@ -1,6 +1,5 @@
 from pathlib import Path
 import httpx
-import typer
 from rich.console import Console
 
 console = Console()

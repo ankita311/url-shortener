@@ -1,10 +1,8 @@
 import typer
 from rich import print
 from rich.console import Console
-from rich.spinner import Spinner
 import httpx
 from . import utils
-
 
 API_BASE = "http://localhost:8000"
 
@@ -44,18 +42,18 @@ def logout():
         print("[yellow]Smarty Pants, You are not logged in[/yellow]")
         raise typer.Exit()
     
-    headers = {"Authorization": f"Bearer {token}"}
-    try:
-        with console.status("[green]Logging you out..[/green]") as status:
-            r = httpx.post(f"{API_BASE}/logout", headers=headers)
-    except httpx.ConnectError as e:
-        print("[red]Server unreachable. You are stuck with us :( [/red]")
-        raise typer.Exit()
+    # headers = {"Authorization": f"Bearer {token}"}
+    # try:
+    #     with console.status("[green]Logging you out..[/green]") as status:
+    #         r = httpx.post(f"{API_BASE}/logout", headers=headers)
+    # except httpx.ConnectError as e:
+    #     print("[red]Server unreachable. You are stuck with us :( [/red]")
+    #     raise typer.Exit()
 
-    if r.status_code == 200:
-        utils.delete_token()
-        print("[bold green]Logged Out Successfully![/bold green]")
-        print("[blue]You left without a goodbye tho :([/blue]")
-    else:
-        print("[red]Failed to log out[/red]")
-        print("[yellow]Haha, Sorry not sorry[/yellow]")
+    # if r.status_code == 200:
+    utils.delete_token()
+    print("[bold green]Logged Out Successfully![/bold green]")
+    print("[blue]You left without a goodbye tho :([/blue]")
+    # else:
+    #     print("[red]Failed to log out[/red]")
+    #     print("[yellow]Haha, Sorry not sorry[/yellow]")

@@ -7,8 +7,6 @@ from rich.console import Console, Group
 from rich.text import Text
 from rich.panel import Panel
 from rich.align import Align
-from rich.layout import Layout
-from rich.columns import Columns
 import httpx
 from . import utils
 from .utils import AuthError

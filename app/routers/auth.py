@@ -18,14 +18,14 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session =
             'token_type': 'Bearer',
             'jti': jti}
 
-@router.post('/logout')
-def logout(data: list = Depends(oauth2.extract_jti_exp), db: Session = Depends(database.get_db)):
-    jti, exp = data
-    exp_datetime = datetime.utcfromtimestamp(exp)
+# @router.post('/logout')
+# def logout(data: list = Depends(oauth2.extract_jti_exp), db: Session = Depends(database.get_db)):
+#     jti, exp = data
+#     exp_datetime = datetime.utcfromtimestamp(exp)
 
-    blacklisted_token = models.TokenBlacklist(jti=jti, expires_at = exp_datetime)
-    db.add(blacklisted_token)
-    db.commit()
+#     blacklisted_token = models.TokenBlacklist(jti=jti, expires_at = exp_datetime)
+#     db.add(blacklisted_token)
+#     db.commit()
 
-    return {"msg": "successfully logged out"}
+#     return {"msg": "successfully logged out"}
 

@@ -55,16 +55,16 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has been revoked")
     return user
 
-def extract_jti_exp(token: str = Depends(oauth2_scheme)):
-    try:
-        payload = jwt.decode(token, SECRET_KEY, ALGORITHM)
-        jti = payload.get('jti')
-        exp = payload.get('exp')
+# def extract_jti_exp(token: str = Depends(oauth2_scheme)):
+#     try:
+#         payload = jwt.decode(token, SECRET_KEY, ALGORITHM)
+#         jti = payload.get('jti')
+#         exp = payload.get('exp')
 
-        if not jti or not exp:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid Token')
+#         if not jti or not exp:
+#             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid Token')
         
-        return [jti, exp]
+#         return [jti, exp]
     
-    except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+#     except JWTError:
+#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
