@@ -69,6 +69,7 @@ class ClickOut(BaseModel):
 class Analytics(BaseModel):
     url_id: int
     original: HttpUrl
+    short_url: HttpUrl
     total_clicks: int
     click_details: List[ClickOut]
 

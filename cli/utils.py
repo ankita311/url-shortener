@@ -37,7 +37,7 @@ def make_authenticated_request(url: str, method: str = "GET", data: dict = None,
     
     with console.status(status_message) as status:
         if method.upper() == "GET":
-            r = httpx.get(url=url, headers=headers)
+            r = httpx.get(url=url, headers=headers, follow_redirects=False)
         elif method.upper() == "POST":
             r = httpx.post(url=url, headers=headers, json=data)
         elif method.upper() == "PUT":
@@ -52,8 +52,14 @@ def make_authenticated_request(url: str, method: str = "GET", data: dict = None,
     if r.status_code == 401:
         delete_token()
         raise AuthError('[red]Oops! Session expired or invalid token. Please login again.[/red]')
-
-    if r.status_code not in [200, 201, 204]:
+    
+    if r.status_code == 422:
+        raise AuthError("[red]Haha, nice one. Please enter a valid url next time.[/red]")
+    
+    # if r.status_code == 404:
+    #     raise AuthError(f"[red]Error: Short code not found.[/red]")
+            
+    if r.status_code not in [200, 201, 204, 307]:
         raise AuthError(f'[red]Error: {r.status_code} - {r.text}[/red]')
     
     return r

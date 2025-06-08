@@ -7,7 +7,7 @@ from sqlalchemy.orm import relationship
 class Click(Base):
     __tablename__ = 'clicks'
 
-    url_id = Column(Integer, ForeignKey('urls.id'), nullable=False)
+    url_id = Column(Integer, ForeignKey('urls.id', ondelete="CASCADE"), nullable=False)
     ip_address = Column(String, nullable = False, primary_key=True)
     timestamp = Column(TIMESTAMP(timezone=True), server_default=text('now()'), nullable=False, primary_key=True)
 

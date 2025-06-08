@@ -25,8 +25,10 @@ def shorten_url(url_data: schemas.UrlCreate,
         short_code = short_code,
         owner_id = current_user.id
         )
-    
+
     db.add(new_url)
+    current_user.urls_created += 1
+
     db.commit()
     db.refresh(new_url)
 
@@ -40,14 +42,22 @@ def shorten_url(url_data: schemas.UrlCreate,
         'short_url': short_url
     }
 
-@router.get("/by-id/{id}", response_model=schemas.UrlInfo)
-def get_one_url(id: int, db: Session = Depends(database.get_db), current_user: models.User = Depends(oauth2.get_current_user)):
+@router.get("/by-id/{id}", response_model=schemas.UrlOut)
+def get_one_url(id: int,request: Request, db: Session = Depends(database.get_db), current_user: models.User = Depends(oauth2.get_current_user)):
     url = db.query(models.Url).filter(models.Url.id == id, models.Url.owner_id == current_user.id).first()
 
     if not url:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Invalid id")
     
-    return url
+    short_url = str(request.base_url) + url.short_code
+    return {
+        'id': url.id,
+        'original': url.original,
+        'short_code': url.short_code,
+        'clicks': url.clicks,
+        'created_at': url.created_at,
+        'short_url': short_url
+    }
 
 @router.get("/{short_code}", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
 def redirect_to_original(short_code: str, db: Session = Depends(database.get_db), request: Request = None):
@@ -77,7 +87,7 @@ def update_short_code(updated_short_code: schemas.UrlUpdate,
     url_query = db.query(models.Url).filter(models.Url.id == id)
     url = url_query.first()
 
-    if not url_query:
+    if not url:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Url with id {id} not found")
     
     if url.owner_id != current_user.id:
@@ -120,6 +130,7 @@ def delete_url(id: int, db: Session = Depends(database.get_db), current_user: mo
 
 @router.get("/analytics/{url_id}", response_model=schemas.Analytics)
 def get_analytics(url_id: int, 
+                  request: Request,
                   db: Session = Depends(database.get_db), 
                   current_user: models.User = Depends(oauth2.get_current_user)):
     
@@ -129,10 +140,12 @@ def get_analytics(url_id: int,
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Url not found")
     
     clicks = db.query(models.Click).filter(models.Click.url_id == url_id).all()
+    short_url = str(request.base_url) +'/'+ url.short_code
 
     return {
         'url_id': url_id,
         'original': url.original,
+        'short_url': short_url,
         'total_clicks': url.clicks,
         'click_details': clicks
     }
